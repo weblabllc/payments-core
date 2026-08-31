@@ -1,0 +1,87 @@
+{
+  "name": "@risklight/payments-core",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Framework-free payment gateway abstractions: invoice, LiqPay, WayForPay, NOWPayments; Checkbox (PRRO) fiscalization client and orchestrator",
+  "keywords": [
+    "payments",
+    "liqpay",
+    "wayforpay",
+    "nowpayments",
+    "checkbox",
+    "prro",
+    "fiscalization",
+    "ukraine",
+    "gateway",
+    "typescript"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./gateway": {
+      "types": "./dist/gateway.d.ts",
+      "import": "./dist/gateway.js",
+      "default": "./dist/gateway.js"
+    },
+    "./invoice": {
+      "types": "./dist/invoice-gateway.d.ts",
+      "import": "./dist/invoice-gateway.js",
+      "default": "./dist/invoice-gateway.js"
+    },
+    "./liqpay": {
+      "types": "./dist/liqpay-gateway.d.ts",
+      "import": "./dist/liqpay-gateway.js",
+      "default": "./dist/liqpay-gateway.js"
+    },
+    "./wayforpay": {
+      "types": "./dist/wayforpay-gateway.d.ts",
+      "import": "./dist/wayforpay-gateway.js",
+      "default": "./dist/wayforpay-gateway.js"
+    },
+    "./nowpayments": {
+      "types": "./dist/nowpayments-gateway.d.ts",
+      "import": "./dist/nowpayments-gateway.js",
+      "default": "./dist/nowpayments-gateway.js"
+    },
+    "./checkbox": {
+      "types": "./dist/checkbox.d.ts",
+      "import": "./dist/checkbox.js",
+      "default": "./dist/checkbox.js"
+    },
+    "./fiscalization": {
+      "types": "./dist/fiscalization.d.ts",
+      "import": "./dist/fiscalization.js",
+      "default": "./dist/fiscalization.js"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.ts",
+      "import": "./dist/registry.js",
+      "default": "./dist/registry.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.0"
+  }
+}
