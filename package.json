@@ -18,11 +18,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RiskLight/payments-core.git"
+    "url": "git+https://github.com/RiskLightS/payments-core.git"
   },
-  "homepage": "https://github.com/RiskLight/payments-core",
+  "homepage": "https://github.com/RiskLightS/payments-core",
   "bugs": {
-    "url": "https://github.com/RiskLight/payments-core/issues"
+    "url": "https://github.com/RiskLightS/payments-core/issues"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
