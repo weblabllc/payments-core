@@ -1,4 +1,6 @@
 import { createHmac } from 'crypto';
+
+import { safeEqual } from './safe-equal.js';
 import {
     CreatePaymentInput,
     CreatePaymentResult,
@@ -77,7 +79,7 @@ const webhook: WebhookHandler<NowPaymentsConfig> = {
         if (!signature) return false;
         const { __signature, ...body } = p;
         const expected = nowPaymentsSignature(body, config.ipnSecret);
-        return signature.length === expected.length && signature.toLowerCase() === expected;
+        return safeEqual(signature.toLowerCase(), expected);
     },
     extract(payload: unknown): WebhookEvent {
         const p = payload as NowPaymentsIpnPayload;

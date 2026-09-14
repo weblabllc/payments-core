@@ -1,4 +1,6 @@
 import { createHash } from 'crypto';
+
+import { safeEqual } from './safe-equal.js';
 import {
     CreatePaymentInput,
     CreatePaymentResult,
@@ -59,7 +61,8 @@ const webhook: WebhookHandler<LiqPayConfig> = {
 
     verify(payload: unknown, config: LiqPayConfig): boolean {
         const p = payload as LiqPayCallbackPayload;
-        return sign(p.data, config.privateKey) === p.signature;
+        if (!safeEqual(sign(p.data, config.privateKey), p.signature)) return false;
+        return p.decoded.status !== 'sandbox' || config.publicKey.startsWith('sandbox');
     },
 
     extract(payload: unknown): WebhookEvent {

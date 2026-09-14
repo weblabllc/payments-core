@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { nowPaymentsSignature } from '../src/nowpayments-gateway.js';
 import { repairBrokenJson } from '../src/wayforpay-gateway.js';
 import { InvoiceGateway } from '../src/invoice-gateway.js';
+import { LiqPayGateway } from '../src/liqpay-gateway.js';
 
 describe('nowPaymentsSignature', () => {
     it('is independent of key order', () => {
@@ -35,5 +36,30 @@ describe('InvoiceGateway', () => {
         expect(gw.confirmation).toBe('manual');
         expect(result.status).toBe('authorized');
         expect(result.publicMetadata).toMatchObject({ iban: 'UA123', purpose: 'Оплата ORD1' });
+    });
+});
+
+describe('LiqPayGateway webhook', () => {
+    const { createHash } = require('crypto') as typeof import('crypto');
+    const sign = (data: string, key: string) => createHash('sha1').update(key + data + key).digest('base64');
+    const callback = (status: string, key: string) => {
+        const data = Buffer.from(JSON.stringify({ order_id: 'ORD1', status, amount: 250 })).toString('base64');
+        return `data=${encodeURIComponent(data)}&signature=${encodeURIComponent(sign(data, key))}`;
+    };
+
+    it('accepts a valid signature and rejects a forged one in constant time', () => {
+        const gw = new LiqPayGateway();
+        const config = { publicKey: 'i12345', privateKey: 'secret' };
+        const ok = gw.webhook.parse(callback('success', 'secret'))!;
+        expect(gw.webhook.verify(ok, config)).toBe(true);
+        const forged = gw.webhook.parse(callback('success', 'wrong'))!;
+        expect(gw.webhook.verify(forged, config)).toBe(false);
+    });
+
+    it('does not treat sandbox status as paid under a live key', () => {
+        const gw = new LiqPayGateway();
+        const sandbox = gw.webhook.parse(callback('sandbox', 'secret'))!;
+        expect(gw.webhook.verify(sandbox, { publicKey: 'i12345', privateKey: 'secret' })).toBe(false);
+        expect(gw.webhook.verify(sandbox, { publicKey: 'sandbox_i12345', privateKey: 'secret' })).toBe(true);
     });
 });

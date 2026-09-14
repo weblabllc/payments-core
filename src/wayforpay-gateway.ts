@@ -1,4 +1,6 @@
 import { createHmac } from 'crypto';
+
+import { safeEqual } from './safe-equal.js';
 import {
     CreatePaymentInput,
     CreatePaymentResult,
@@ -81,7 +83,7 @@ const webhook: WebhookHandler<WayForPayConfig> = {
             ],
             config.merchantSecret,
         );
-        return expected.toLowerCase() === String(p.merchantSignature).toLowerCase();
+        return safeEqual(expected.toLowerCase(), String(p.merchantSignature ?? '').toLowerCase());
     },
 
     extract(payload: unknown): WebhookEvent {
