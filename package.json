@@ -1,6 +1,6 @@
 {
-  "name": "@risklight/payments-core",
-  "version": "0.1.1",
+  "name": "@weblabllc/payments-core",
+  "version": "0.2.0",
   "type": "module",
   "description": "Framework-free payment gateway abstractions: invoice, LiqPay, WayForPay, NOWPayments; Checkbox (PRRO) fiscalization client and orchestrator",
   "keywords": [
@@ -16,13 +16,14 @@
     "typescript"
   ],
   "license": "MIT",
+  "author": "WebLab LLC <hello@weblab.llc>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RiskLightS/payments-core.git"
+    "url": "git+https://github.com/weblabllc/payments-core.git"
   },
-  "homepage": "https://github.com/RiskLightS/payments-core",
+  "homepage": "https://github.com/weblabllc/payments-core#readme",
   "bugs": {
-    "url": "https://github.com/RiskLightS/payments-core/issues"
+    "url": "https://github.com/weblabllc/payments-core/issues"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -74,7 +75,10 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "sideEffects": false,
   "engines": {
@@ -89,10 +93,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "tsc",
-    "lint": "oxlint src/"
+    "lint": "oxlint src/",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.11",
     "oxlint": "^1.80.0",
     "typescript": "^5.8.0",
     "vitest": "^4.1.0"

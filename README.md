@@ -1,17 +1,17 @@
-# @risklight/payments-core
+# @weblabllc/payments-core
 
 Framework-free payment layer for Ukrainian e-commerce: one `PaymentGateway` interface, four gateways (invoice / LiqPay / WayForPay / NOWPayments), Checkbox (ПРРО) fiscalization client and an orchestrator with auto-retries and manual resend. Zero framework imports — adapters for Vendure/Express/Nest live in your app.
 
 ## Install
 
 ```bash
-npm install @risklight/payments-core
+npm install @weblabllc/payments-core
 ```
 
 ## Enable only what you need
 
 ```ts
-import { PaymentsRegistry } from '@risklight/payments-core/registry'
+import { PaymentsRegistry } from '@weblabllc/payments-core/registry'
 
 const payments = await PaymentsRegistry.create({ gateways: ['invoice', 'nowpayments'] })
 payments.get('liqpay') // throws: not enabled
@@ -20,7 +20,7 @@ payments.get('liqpay') // throws: not enabled
 Or import a single gateway directly:
 
 ```ts
-import { LiqPayGateway } from '@risklight/payments-core/liqpay'
+import { LiqPayGateway } from '@weblabllc/payments-core/liqpay'
 ```
 
 ## Create a payment
@@ -37,13 +37,15 @@ const result = await payments.get('nowpayments').createPayment(
 ## Webhooks
 
 Every webhook-confirmed gateway exposes `webhook: { parse, verify, extract, respond? }`.
-If `webhook.signatureHeaderName` is set (NOWPayments), inject the header value as `payload.__signature` before `verify`.
+If `webhook.signatureHeaderName` is set (NOWPayments), pass that header's value as the third argument: `webhook.verify(payload, config, req.headers['x-nowpayments-sig'])`.
+
+Outgoing requests time out after 20 s; a non-JSON gateway reply becomes a clear error.
 
 ## Fiscalization (Checkbox ПРРО)
 
 ```ts
-import { CheckboxClient } from '@risklight/payments-core/checkbox'
-import { Fiscalizer, InMemoryFiscalizationStore } from '@risklight/payments-core/fiscalization'
+import { CheckboxClient } from '@weblabllc/payments-core/checkbox'
+import { Fiscalizer, InMemoryFiscalizationStore } from '@weblabllc/payments-core/fiscalization'
 
 const client = new CheckboxClient({ licenseKey: '...', login: '...', password: '...' })
 const fiscal = new Fiscalizer(client, myStore, { maxAutoAttempts: 5 })

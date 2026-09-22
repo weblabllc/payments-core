@@ -38,6 +38,8 @@ export interface CheckboxResponse<T = unknown> {
     body: T;
 }
 
+import { REQUEST_TIMEOUT_MS } from './http.js';
+
 const DEFAULT_BASE_URL = 'https://api.checkbox.ua/api/v1';
 
 export class CheckboxError extends Error {
@@ -76,6 +78,7 @@ export class CheckboxClient {
             method,
             headers,
             body: options.json !== undefined ? JSON.stringify(options.json) : undefined,
+            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
         });
         const text = await res.text();
         let body: unknown = null;

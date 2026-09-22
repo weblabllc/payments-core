@@ -36,7 +36,7 @@ export interface WebhookEvent {
 export interface WebhookHandler<C> {
     readonly signatureHeaderName?: string;
     parse(rawBody: string): unknown | null;
-    verify(payload: unknown, config: C): boolean;
+    verify(payload: unknown, config: C, signature?: string): boolean;
     extract(payload: unknown): WebhookEvent;
     respond?(payload: unknown, config: C): unknown;
 }

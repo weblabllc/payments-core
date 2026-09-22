@@ -1,5 +1,6 @@
 import { createHmac } from 'crypto';
 
+import { postJson } from './http.js';
 import { safeEqual } from './safe-equal.js';
 import {
     CreatePaymentInput,
@@ -29,7 +30,7 @@ const STATUS_MAP: Record<string, GatewayPaymentStatus> = {
     Voided: 'declined',
 };
 
-function sign(fields: Array<string | number>, secret: string): string {
+export function wayForPaySignature(fields: Array<string | number>, secret: string): string {
     return createHmac('md5', secret).update(fields.join(';'), 'utf8').digest('hex');
 }
 
@@ -70,7 +71,7 @@ const webhook: WebhookHandler<WayForPayConfig> = {
     verify(payload: unknown, config: WayForPayConfig): boolean {
         const p = payload as WfpCallbackPayload;
         if (!p.merchantSignature) return false;
-        const expected = sign(
+        const expected = wayForPaySignature(
             [
                 String(p.merchantAccount),
                 String(p.orderReference),
@@ -103,7 +104,7 @@ const webhook: WebhookHandler<WayForPayConfig> = {
             orderReference: p.orderReference,
             status: 'accept',
             time,
-            signature: sign([String(p.orderReference), 'accept', String(time)], config.merchantSecret),
+            signature: wayForPaySignature([String(p.orderReference), 'accept', String(time)], config.merchantSecret),
         };
     },
 };
@@ -119,9 +120,9 @@ export class WayForPayGateway implements PaymentGateway<WayForPayConfig> {
         const amount = (input.amountMinor / 100).toFixed(2);
         const productNames = [input.description];
         const productCounts = ['1'];
-        const productPrices = [amount];
+        const productPrices = [Number(amount)];
 
-        const signature = sign(
+        const signature = wayForPaySignature(
             [
                 config.merchantAccount,
                 config.merchantDomain,
@@ -148,21 +149,17 @@ export class WayForPayGateway implements PaymentGateway<WayForPayConfig> {
             currency: input.currencyCode,
             productName: productNames,
             productCount: productCounts.map(Number),
-            productPrice: productPrices.map(Number),
+            productPrice: productPrices,
             language: 'UA',
             ...(input.webhookUrl ? { serviceUrl: input.webhookUrl } : {}),
             ...(input.returnUrl ? { returnUrl: input.returnUrl } : {}),
             merchantSignature: signature,
         };
 
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
-        const body = (await res.json()) as { invoiceUrl?: string; reason?: string; reasonCode?: number };
+        const res = await postJson(API_URL, payload);
+        const body = (res.body && typeof res.body === 'object' ? res.body : {}) as { invoiceUrl?: string; reason?: string; reasonCode?: number };
         if (!body.invoiceUrl) {
-            throw new Error(`WayForPay: ${body.reason ?? 'no invoiceUrl'} (code ${body.reasonCode ?? '?'})`);
+            throw new Error(`WayForPay: ${body.reason ?? `no invoiceUrl, HTTP ${res.status}`} (code ${body.reasonCode ?? '?'})`);
         }
         return {
             transactionId: orderReference,

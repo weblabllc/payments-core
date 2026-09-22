@@ -18,7 +18,12 @@ export interface LiqPayConfig {
 const STATUS_MAP: Record<string, GatewayPaymentStatus> = {
     success: 'settled',
     sandbox: 'settled',
+    wait_compensation: 'settled',
     wait_accept: 'authorized',
+    hold_wait: 'authorized',
+    invoice_wait: 'pending',
+    cash_wait: 'pending',
+    wait_reserve: 'pending',
     processing: 'pending',
     prepared: 'pending',
     wait_secure: 'pending',

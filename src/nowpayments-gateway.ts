@@ -1,5 +1,6 @@
 import { createHmac } from 'crypto';
 
+import { postJson } from './http.js';
 import { safeEqual } from './safe-equal.js';
 import {
     CreatePaymentInput,
@@ -73,9 +74,9 @@ const webhook: WebhookHandler<NowPaymentsConfig> = {
             return null;
         }
     },
-    verify(payload: unknown, config: NowPaymentsConfig): boolean {
+    verify(payload: unknown, config: NowPaymentsConfig, headerSignature?: string): boolean {
         const p = payload as NowPaymentsIpnPayload;
-        const signature = p.__signature;
+        const signature = headerSignature ?? p.__signature;
         if (!signature) return false;
         const { __signature, ...body } = p;
         const expected = nowPaymentsSignature(body, config.ipnSecret);
@@ -98,13 +99,9 @@ export class NowPaymentsGateway implements PaymentGateway<NowPaymentsConfig> {
     readonly webhook = webhook;
 
     async createPayment(input: CreatePaymentInput, config: NowPaymentsConfig): Promise<CreatePaymentResult> {
-        const res = await fetch(`${apiBase(config)}/invoice`, {
-            method: 'POST',
-            headers: {
-                'x-api-key': config.apiKey,
-                'content-type': 'application/json',
-            },
-            body: JSON.stringify({
+        const res = await postJson(
+            `${apiBase(config)}/invoice`,
+            {
                 price_amount: input.amountMinor / 100,
                 price_currency: input.currencyCode.toLowerCase(),
                 order_id: input.orderCode,
@@ -112,9 +109,10 @@ export class NowPaymentsGateway implements PaymentGateway<NowPaymentsConfig> {
                 ipn_callback_url: input.webhookUrl,
                 success_url: input.returnUrl,
                 cancel_url: input.returnUrl,
-            }),
-        });
-        const body: any = await res.json().catch(() => null);
+            },
+            { 'x-api-key': config.apiKey },
+        );
+        const body: any = res.body && typeof res.body === 'object' ? res.body : null;
         if (!res.ok || !body?.invoice_url) {
             return {
                 transactionId: input.orderCode,
