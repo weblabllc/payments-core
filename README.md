@@ -1,5 +1,7 @@
 # @weblabllc/payments-core
 
+[![npm](https://img.shields.io/npm/v/@weblabllc/payments-core)](https://www.npmjs.com/package/@weblabllc/payments-core) [![ci](https://github.com/weblabllc/payments-core/actions/workflows/ci.yml/badge.svg)](https://github.com/weblabllc/payments-core/actions/workflows/ci.yml) [![license](https://img.shields.io/npm/l/@weblabllc/payments-core)](LICENSE)
+
 Framework-free payment layer for Ukrainian e-commerce: one `PaymentGateway` interface, four gateways (invoice / LiqPay / WayForPay / NOWPayments), Checkbox (ПРРО) fiscalization client and an orchestrator with auto-retries and manual resend. Zero framework imports — adapters for Vendure/Express/Nest live in your app.
 
 ## Install

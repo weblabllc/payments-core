@@ -1,6 +1,6 @@
 {
   "name": "@weblabllc/payments-core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "Framework-free payment gateway abstractions: invoice, LiqPay, WayForPay, NOWPayments; Checkbox (PRRO) fiscalization client and orchestrator",
   "keywords": [
