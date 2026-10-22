@@ -1,7 +1,13 @@
 export const REQUEST_TIMEOUT_MS = 20_000;
 
-export async function postJson(url: string, body: unknown, headers: Record<string, string> = {}): Promise<{ ok: boolean; status: number; body: any }> {
+export async function postJson(
+    url: string,
+    body: unknown,
+    headers: Record<string, string> = {},
+    options: { redirect?: 'follow' | 'error' | 'manual' } = {},
+): Promise<{ ok: boolean; status: number; body: any }> {
     const res = await fetch(url, {
+        ...options,
         method: 'POST',
         headers: { 'content-type': 'application/json', accept: 'application/json', ...headers },
         body: JSON.stringify(body),

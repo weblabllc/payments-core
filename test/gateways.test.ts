@@ -11,22 +11,7 @@ import {
     WayForPayGateway,
     wayForPaySignature,
 } from '../src/index.js';
-
-type Call = { url: string; init: RequestInit };
-
-function mockFetch(...responses: Array<{ status?: number; body: unknown }>) {
-    const calls: Call[] = [];
-    const queue = [...responses];
-    vi.stubGlobal('fetch', vi.fn(async (url: string, init: RequestInit) => {
-        calls.push({ url, init });
-        const next = queue.shift() ?? { status: 500, body: '' };
-        const text = typeof next.body === 'string' ? next.body : JSON.stringify(next.body);
-        return new Response(text, { status: next.status ?? 200 });
-    }));
-    return calls;
-}
-
-const jsonBody = (call: Call) => JSON.parse(String(call.init.body));
+import { type Call, jsonBody, mockFetch } from './fetch-mock.js';
 
 afterEach(() => {
     vi.unstubAllGlobals();

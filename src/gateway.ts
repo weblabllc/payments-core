@@ -27,6 +27,7 @@ export interface CreatePaymentResult {
 }
 
 export interface WebhookEvent {
+    kind?: 'payment' | 'rule-status';
     transactionId: string;
     status: GatewayPaymentStatus;
     amountMinor?: number;
